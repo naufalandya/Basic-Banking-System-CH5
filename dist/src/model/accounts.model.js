@@ -18,7 +18,7 @@ class Account {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const exist = yield prisma.accounts.findUnique({ where: { bank_account_number: bankAccountNumber } });
-                if (!exist) {
+                if (exist) {
                     return undefined;
                 }
                 const account = yield prisma.accounts.create({
@@ -32,6 +32,7 @@ class Account {
                 return account;
             }
             catch (error) {
+                console.log(error);
                 throw error;
             }
         });
@@ -95,3 +96,4 @@ class Account {
         });
     }
 }
+exports.default = new Account;

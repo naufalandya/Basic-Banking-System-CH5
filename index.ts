@@ -13,6 +13,10 @@ app.get("/helloworld", (req : Request, res : Response) => {
     })
 })
 
+import apiRouter from './src/routes/index'
+
+app.use("/api/v1", apiRouter)
+
 app.use((err : any , req : Request, res : Response, next : NextFunction) => {
     console.log(err);
     res.status(500).json({

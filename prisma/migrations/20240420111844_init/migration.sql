@@ -13,7 +13,7 @@ CREATE TABLE "Users" (
 CREATE TABLE "Accounts" (
     "id" SERIAL NOT NULL,
     "bank_name" VARCHAR(100) NOT NULL,
-    "bank_account_number" INTEGER NOT NULL,
+    "bank_account_number" BIGINT NOT NULL,
     "balance" BIGINT NOT NULL,
     "userID" TEXT NOT NULL,
 

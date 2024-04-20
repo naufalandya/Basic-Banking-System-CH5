@@ -6,15 +6,15 @@ class Account {
     constructor(){
     }
 
-    async createAccount(bankName: string, bankAccountNumber: number, balance: bigint, userId: string): Promise<Accounts | undefined> {
+    async createAccount(bankName: string, bankAccountNumber: bigint, balance: bigint, userId: string): Promise<Accounts | undefined> {
         try {
 
             const exist = await prisma.accounts.findUnique({ where: { bank_account_number : bankAccountNumber } });
 
-            if (!exist) {
+            if (exist) {
                 return undefined
             }
-
+            
             const account = await prisma.accounts.create({
                 data: {
                     bank_name: bankName,
@@ -23,8 +23,10 @@ class Account {
                     userID: userId
                 }
             });
+
             return account;
         } catch (error) {
+        console.log(error)
             throw error;
         }
     }
@@ -75,7 +77,7 @@ class Account {
             if(!account){
                 return undefined
             }
-            
+
             const updatedAccount = await prisma.accounts.update({
                 where: { id: accountId },
                 data: newData
@@ -89,3 +91,4 @@ class Account {
 
 }
 
+export default new Account

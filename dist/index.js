@@ -13,6 +13,8 @@ app.get("/helloworld", (req, res) => {
         message: "Hello World"
     });
 });
+const index_1 = __importDefault(require("./src/routes/index"));
+app.use("/api/v1", index_1.default);
 app.use((err, req, res, next) => {
     console.log(err);
     res.status(500).json({
