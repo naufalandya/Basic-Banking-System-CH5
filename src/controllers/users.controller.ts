@@ -1,4 +1,3 @@
-import accountsModel from "../model/accounts.model";
 import usersModel from "../model/users.model";
 import { Request, Response, NextFunction } from "express";
 import { validationResult } from 'express-validator';

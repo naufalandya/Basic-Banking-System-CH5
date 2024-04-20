@@ -13,10 +13,11 @@ app.get("/helloworld", (req : Request, res : Response) => {
     })
 })
 
-import {accountRouter, userRouter} from './src/routes/index'
+import {accountRouter, userRouter, transactionRouter} from './src/routes/index'
 
 app.use("/api/v1/accounts", accountRouter)
 app.use("/api/v1/users", userRouter)
+app.use("/api/v1/transactions", transactionRouter)
 
 app.use((err : any , req : Request, res : Response, next : NextFunction) => {
     console.log(err);

@@ -1,6 +1,6 @@
 import transactionsModel from "../model/transactions.model";
 import { Request, Response, NextFunction } from "express";
-import { Transactions } from '@prisma/client';
+import { validationResult } from 'express-validator';
 
 class TransactionsController{
     constructor(){}
@@ -32,6 +32,15 @@ class TransactionsController{
     }
     
     async createTransactions(req: Request, res: Response): Promise<object> {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({
+                status: false,
+                message: "Validation failed",
+                errors: errors.array()
+            });
+        }
+        
         const { source_account_id, destination_account_id, amount } = req.body;
     
         try {
@@ -82,6 +91,42 @@ class TransactionsController{
             });
         }
     }
+
+    async getTransactionById(req: Request, res : Response, next: NextFunction): Promise<object> {
+        try {
+            const id = Number(req.params.id)
+            const transaction = await transactionsModel.getTransactionById(id)
+
+            if (!transaction){
+                return res.status(404).json({
+                    status : false,
+                    message : `Transaction with id ${id} is not exist`,
+                    data : null
+                })
+            }
+
+            const transactionData = {
+                source_account_id: transaction.source_account_id,
+                destination_account_id: transaction.destination_account_id,
+                amount: transaction.amount
+            };
+
+            return res.status(201).json({
+                status : true,
+                message : "success",
+                data : transactionData
+            })
+
+        } catch (error) {
+            console.error("Error fetching transaction:", error);
+            return res.status(500).json({
+                status: false,
+                message: "Internal server error",
+                data: null
+            });
+        }
+    }
+    
 }
 
 export default new TransactionsController
