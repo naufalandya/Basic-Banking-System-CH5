@@ -39,11 +39,12 @@ const prisma = new client_1.PrismaClient();
 class User {
     constructor() {
     }
-    createUser(username, email, password, role) {
+    createUser(username, email, password) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const exist = yield prisma.users.findUnique({ where: { email } });
-                if (exist) {
+                const isEmail = yield prisma.users.findUnique({ where: { email } });
+                const isUsername = yield prisma.users.findUnique({ where: { username } });
+                if (isEmail || isUsername) {
                     return undefined;
                 }
                 const uuid = (0, uuid_1.v4)();
