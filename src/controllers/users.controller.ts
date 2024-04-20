@@ -3,7 +3,7 @@ import usersModel from "../model/users.model";
 import { Request, Response, NextFunction } from "express";
 import { validationResult } from 'express-validator';
 
-class AccountsController {
+class UsersController {
     constructor() {}
 
     async checkId (req: Request, res : Response, next: NextFunction): Promise<object | undefined> {
@@ -50,7 +50,7 @@ class AccountsController {
             if (!newUser) {
                 return res.status(409).json({
                     status: false,
-                    message: "Email is already registered",
+                    message: "Email or Username is already registered",
                     data: null
                 });
             }
@@ -144,4 +144,4 @@ class AccountsController {
     
 }
 
-export default new AccountsController
+export default new UsersController

@@ -12,9 +12,10 @@ class User {
     async createUser(username : string , email : string , password : string): Promise<Users | undefined>{
      try {
 
-        const exist = await prisma.users.findUnique({ where: { email } });
+        const isEmail = await prisma.users.findUnique({ where: { email } });
+        const isUsername = await prisma.users.findUnique({ where: { username } });
 
-        if (exist) {
+        if (isEmail || isUsername ) {
             return undefined
         }
 
