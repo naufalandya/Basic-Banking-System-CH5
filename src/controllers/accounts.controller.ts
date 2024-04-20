@@ -51,7 +51,7 @@ class AccountsController {
             if (!account){
                 return res.status(409).json({
                     status : false,
-                    message : "bank account number is already used",
+                    message : "bank account number is already registered",
                     data : null
                 })
             }

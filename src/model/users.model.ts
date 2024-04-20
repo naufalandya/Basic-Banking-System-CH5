@@ -9,7 +9,7 @@ class User {
 
     }
 
-    async createUser(username : string , email : string , password : string, role : string): Promise<Users | undefined>{
+    async createUser(username : string , email : string , password : string): Promise<Users | undefined>{
      try {
 
         const exist = await prisma.users.findUnique({ where: { email } });
