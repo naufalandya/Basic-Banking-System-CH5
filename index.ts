@@ -1,11 +1,23 @@
 import express, { Express, NextFunction, Request, Response } from "express";
 import morgan from "morgan";
+import cors from 'cors';
+
+import swaggerUI from 'swagger-ui-express';
+import YAML from 'yaml';
+import fs from 'fs';
+
+const file = fs.readFileSync('./api-docs.yaml', 'utf-8');
+const swaggerDocument = YAML.parse(file);
+
+
 
 const app : Express = express()
 
-
+app.use(cors());
 app.use(morgan('dev'))
 app.use(express.json())
+app.use('/v1/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
+
 
 app.get("/helloworld", (req : Request, res : Response) => {
     res.json({
