@@ -1,0 +1,40 @@
+{
+  "name": "firstapi",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start:dev": "nodemon server.ts",
+    "start:prod": "nodemon server.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "^5.12.1",
+    "@types/bcrypt": "^5.0.2",
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.12.6",
+    "@types/pug": "^2.0.10",
+    "axios": "^1.6.8",
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "morgan": "^1.10.0",
+    "pug": "^3.0.2",
+    "ts-node": "^10.9.2",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/mongoose": "^5.11.97",
+    "@types/morgan": "^1.9.9",
+    "@types/uuid": "^9.0.8",
+    "nodemon": "^3.1.0",
+    "prisma": "^5.12.1",
+    "typescript": "^5.4.4"
+  },
+  "description": "",
+  "execMap": {
+    "ts": "node --require ts-node/register"
+  }
+}
