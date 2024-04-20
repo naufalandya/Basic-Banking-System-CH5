@@ -40,14 +40,13 @@ class Account {
         }
     }
 
-    async  getAccountById(accountId: number): Promise<Accounts | undefined> {
+    async getAccountById(accountId: number): Promise<Accounts | undefined> {
         try {
             const account = await prisma.accounts.findUnique({ where: { id: accountId } });
-
+             
             if(!account){
                 return undefined
             }
-
             return account;
         } catch (error) {
             throw error;
