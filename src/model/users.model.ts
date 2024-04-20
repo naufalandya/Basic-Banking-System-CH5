@@ -1,16 +1,15 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Users } from "@prisma/client";
 import { v4 as uuidv4 } from 'uuid'
 import * as bcrypt from 'bcrypt';
 
 const prisma : PrismaClient = new PrismaClient();
-
 
 class User {
     constructor(){
 
     }
 
-    async createUser(username : string , email : string , password : string, role : string): Promise<object | undefined>{
+    async createUser(username : string , email : string , password : string, role : string): Promise<Users | undefined>{
      try {
 
         const exist = await prisma.users.findUnique({ where: { email } });
@@ -21,7 +20,7 @@ class User {
 
         const uuid : string = uuidv4();
         const encryptedPassword : string = await bcrypt.hash(password, 10)
-        const user : object = await prisma.users.create({
+        const user : Users = await prisma.users.create({
 
             data : {
                 id: uuid,
@@ -39,9 +38,9 @@ class User {
      } 
     }
 
-    async getUserByUsername(username: string): Promise<object | undefined> {
+    async getUserByUsername(username: string): Promise<Users | undefined> {
         try {
-            // Cari pengguna berdasarkan username
+
             const user = await prisma.users.findUnique({ where: { username } });
 
             if(!user){
@@ -56,7 +55,7 @@ class User {
         }
     }
 
-    async getAllUsers(): Promise<object[]> {
+    async getAllUsers(): Promise<Users[]> {
         try {
 
             const users = await prisma.users.findMany();
@@ -67,18 +66,33 @@ class User {
         }
     }
 
-    async deleteUserByUsername(username: string): Promise<void> {
+    async deleteUserByUsername(username: string): Promise<Users | undefined > {
         try {
 
+            const exist = await prisma.users.findUnique({ where: { username } });
+
+            if (!exist) {
+                return undefined
+            }
+
             await prisma.users.delete({ where: { username } });
+
+            return exist
+
         } catch (error) {
             console.error('Error while deleting user by username:', error);
             throw error;
         }
     }
 
-    async updateUserByUsername(username: string, newData: any): Promise<object | undefined> {
+    async updateUserByUsername(username: string, newData: any): Promise<Users | undefined> {
         try {
+
+            const exist = await prisma.users.findUnique({ where: { username } });
+
+            if (!exist) {
+                return undefined
+            }
 
             const updatedUser = await prisma.users.update({
                 where: { username },
@@ -93,9 +107,9 @@ class User {
         }
     }
 
-    async getUserById(id: string): Promise<object | undefined> {
+    async getUserById(id: string): Promise<Users | undefined> {
         try {
-            // Cari pengguna berdasarkan username
+
             const user = await prisma.users.findUnique({ where: { id } });
 
             if(!user){

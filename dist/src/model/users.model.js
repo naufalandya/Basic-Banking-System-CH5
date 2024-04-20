@@ -67,7 +67,6 @@ class User {
     getUserByUsername(username) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                // Cari pengguna berdasarkan username
                 const user = yield prisma.users.findUnique({ where: { username } });
                 if (!user) {
                     return undefined;
@@ -95,7 +94,12 @@ class User {
     deleteUserByUsername(username) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
+                const exist = yield prisma.users.findUnique({ where: { username } });
+                if (!exist) {
+                    return undefined;
+                }
                 yield prisma.users.delete({ where: { username } });
+                return exist;
             }
             catch (error) {
                 console.error('Error while deleting user by username:', error);
@@ -106,6 +110,10 @@ class User {
     updateUserByUsername(username, newData) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
+                const exist = yield prisma.users.findUnique({ where: { username } });
+                if (!exist) {
+                    return undefined;
+                }
                 const updatedUser = yield prisma.users.update({
                     where: { username },
                     data: newData,
@@ -121,7 +129,6 @@ class User {
     getUserById(id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                // Cari pengguna berdasarkan username
                 const user = yield prisma.users.findUnique({ where: { id } });
                 if (!user) {
                     return undefined;
