@@ -16,8 +16,6 @@ const app : Express = express()
 app.use(cors());
 app.use(morgan('dev'))
 app.use(express.json())
-app.use('/v1/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
-
 
 app.get("/helloworld", (req : Request, res : Response) => {
     res.json({
@@ -27,6 +25,7 @@ app.get("/helloworld", (req : Request, res : Response) => {
 
 import {accountRouter, userRouter, transactionRouter} from './src/routes/index'
 
+app.use('/v1/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 app.use("/api/v1/accounts", accountRouter)
 app.use("/api/v1/users", userRouter)
 app.use("/api/v1/transactions", transactionRouter)

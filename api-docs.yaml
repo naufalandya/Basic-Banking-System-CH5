@@ -1,34 +1,134 @@
 openapi: 3.0.1
 info:
   title: Banking System, API
-  description: API for managing transactions between accounts
+  description: API for banking management
   version: 1.0.0
   contact:
     email: andyakuliah@example.com
 servers:
   - url: http://localhost:5102/api/v1
 
+tags:
+  - name: Users
+    description: Operations related to user management
+  - name: Transactions
+    description: Operations related to transaction management
+  - name: Accounts
+    description: Operations related to bank account management
 paths:
-  /transactions:
-    get:
-      summary: Retrieve all transactions
-      responses:
-        '200':
-          description: Successful response
+    /transactions:
+      get:
+        summary: Retrieve all transactions
+        tags: 
+          - Transactions
+        responses:
+          '200':
+            description: Successful response
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: boolean
+                      description: Indicates the success of the request
+                    message:
+                      type: string
+                      description: A message describing the result of the request
+                    data:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          source_account_id:
+                            type: integer
+                            description: The ID of the source account for the transaction
+                          destination_account_id:
+                            type: integer
+                            description: The ID of the destination account for the transaction
+                          amount:
+                            type: integer
+                            description: The amount of the transaction
+      post:
+        summary: Create a new transaction
+        tags: 
+          - Transactions
+        requestBody:
+          required: true
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  status:
-                    type: boolean
-                    description: Indicates the success of the request
-                  message:
-                    type: string
-                    description: A message describing the result of the request
-                  data:
-                    type: array
-                    items:
+                  source_account_id:
+                    type: integer
+                    description: The ID of the source account for the transaction
+                  destination_account_id:
+                    type: integer
+                    description: The ID of the destination account for the transaction
+                  amount:
+                    type: integer
+                    description: The amount of the transaction
+        responses:
+          '201':
+            description: Transaction created successfully
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: boolean
+                      description: Indicates the success of the request
+                    message:
+                      type: string
+                      description: A message describing the result of the request
+                    data:
+                      type: object
+                      description: Details of the created transaction
+          '400':
+            description: Bad request
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: boolean
+                      description: Indicates the failure of the request
+                    message:
+                      type: string
+                      description: Error message indicating bad request
+                    data:
+                      type: string
+                      description: Null data for a failed request
+    /transactions/{id}:
+      get:
+        summary: Retrieve a transaction by ID
+        tags: 
+          - Transactions
+        parameters:
+          - in: path
+            name: id
+            required: true
+            description: ID of the transaction to retrieve
+            schema:
+              type: integer
+        responses:
+          '200':
+            description: Successful response
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: boolean
+                      description: Indicates the success of the request
+                    message:
+                      type: string
+                      description: A message describing the result of the request
+                    data:
                       type: object
                       properties:
                         source_account_id:
@@ -40,55 +140,358 @@ paths:
                         amount:
                           type: integer
                           description: The amount of the transaction
-  /transactions/{id}:
-    get:
-      summary: Retrieve a transaction by ID
-      parameters:
-        - in: path
-          name: id
+          '404':
+            description: Transaction not found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: boolean
+                      description: Indicates the failure of the request
+                    message:
+                      type: string
+                      description: Error message indicating transaction not found
+                    data:
+                      type: string
+                      description: Null data for a failed request
+      
+    /users:
+      get:
+        summary: Retrieve all users
+        tags: 
+          - Users
+        responses:
+          '200':
+            description: Successful response
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: boolean
+                      description: Indicates the success of the request
+                    message:
+                      type: string
+                      description: A message describing the result of the request
+                    data:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            description: The unique identifier of the user
+                          username:
+                            type: string
+                            description: The username of the user
+                          email:
+                            type: string
+                            description: The email address of the user
+                          role:
+                            type: string
+                            description: The role of the user
+          '404':
+            description: No users found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: boolean
+                      description: Indicates the failure of the request
+                    message:
+                      type: string
+                      description: Error message indicating no users found
+                    data:
+                      type: string
+                      description: Null data for a failed request
+      post:
+        summary: Create a new user
+        tags: 
+          - Users
+        requestBody:
           required: true
-          description: ID of the transaction to retrieve
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Successful response
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  status:
-                    type: boolean
-                    description: Indicates the success of the request
-                  message:
+                  username:
                     type: string
-                    description: A message describing the result of the request
-                  data:
-                    type: object
-                    properties:
-                      source_account_id:
-                        type: integer
-                        description: The ID of the source account for the transaction
-                      destination_account_id:
-                        type: integer
-                        description: The ID of the destination account for the transaction
-                      amount:
-                        type: integer
-                        description: The amount of the transaction
-        '404':
-          description: Transaction not found
+                    description: The username of the user
+                  email:
+                    type: string
+                    format: email
+                    description: The email address of the user
+                  password:
+                    type: string
+                    description: The password of the user
+        responses:
+          '201':
+            description: User created successfully
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: boolean
+                      description: Indicates the success of the request
+                    message:
+                      type: string
+                      description: A message describing the result of the request
+                    data:
+                      type: object
+                      description: Details of the created user
+          '400':
+            description: Bad request
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: boolean
+                      description: Indicates the failure of the request
+                    message:
+                      type: string
+                      description: Error message indicating bad request
+                    data:
+                      type: string
+                      description: Null data for a failed request
+    /users/{id}:
+      get:
+        summary: Retrieve a user by ID
+        tags: 
+          - Users
+        parameters:
+          - in: path
+            name: id
+            required: true
+            description: ID of the user to retrieve
+            schema:
+              type: string
+              format: uuid
+        responses:
+          '200':
+            description: Successful response
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: boolean
+                      description: Indicates the success of the request
+                    message:
+                      type: string
+                      description: A message describing the result of the request
+                    data:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: The unique identifier of the user
+                        username:
+                          type: string
+                          description: The username of the user
+                        email:
+                          type: string
+                          format: email
+                          description: The email address of the user
+                        role:
+                          type: string
+                          description: The role of the user
+          '404':
+            description: User not found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: boolean
+                      description: Indicates the failure of the request
+                    message:
+                      type: string
+                      description: Error message indicating user not found
+                    data:
+                      type: string
+                      description: Null data for a failed request
+    /accounts:
+      get:
+        summary: Retrieve all accounts
+        tags:
+          - Accounts
+        responses:
+          '200':
+            description: Successful response
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: boolean
+                      description: Indicates the success of the request
+                    message:
+                      type: string
+                      description: A message describing the result of the request
+                    data:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            description: The unique identifier of the account
+                          bank_name:
+                            type: string
+                            description: The name of the bank
+                          bank_account_number:
+                            type: string
+                            description: The account number of the bank account
+                          balance:
+                            type: string
+                            description: The balance of the bank account
+                          userID:
+                            type: string
+                            description: The ID of the user associated with the account
+          '404':
+            description: No accounts found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: boolean
+                      description: Indicates the failure of the request
+                    message:
+                      type: string
+                      description: Error message indicating no accounts found
+                    data:
+                      type: string
+                      description: Null data for a failed request
+      post:
+        summary: Create a new account
+        tags:
+          - Accounts
+        requestBody:
+          required: true
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  status:
-                    type: boolean
-                    description: Indicates the failure of the request
-                  message:
+                  bank_name:
                     type: string
-                    description: Error message indicating transaction not found
-                  data:
+                    description: The name of the bank
+                  bank_account_number:
                     type: string
-                    description: Null data for a failed request
+                    description: The account number of the bank account
+                  balance:
+                    type: string
+                    description: The balance of the bank account
+                  userID:
+                    type: string
+                    description: The ID of the user associated with the account
+        responses:
+          '201':
+            description: Account created successfully
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: boolean
+                      description: Indicates the success of the request
+                    message:
+                      type: string
+                      description: A message describing the result of the request
+                    data:
+                      type: object
+                      description: Details of the created account
+          '400':
+            description: Bad request
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: boolean
+                      description: Indicates the failure of the request
+                    message:
+                      type: string
+                      description: Error message indicating bad request
+                    data:
+                      type: string
+                      description: Null data for a failed request
+
+    /accounts/{id}:
+      get:
+        summary: Retrieve an account by ID
+        tags:
+          - Accounts
+        parameters:
+          - in: path
+            name: id
+            required: true
+            description: ID of the account to retrieve
+            schema:
+              type: integer
+              format: int64
+        responses:
+          '200':
+            description: Successful response
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: boolean
+                      description: Indicates the success of the request
+                    message:
+                      type: string
+                      description: A message describing the result of the request
+                    data:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          description: The unique identifier of the account
+                        bank_name:
+                          type: string
+                          description: The name of the bank
+                        bank_account_number:
+                          type: string
+                          description: The account number of the bank account
+                        balance:
+                          type: string
+                          description: The balance of the bank account
+                        userID:
+                          type: string
+                          description: The ID of the user associated with the account
+          '404':
+            description: Account not found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: boolean
+                      description: Indicates the failure of the request
+                    message:
+                      type: string
+                      description: Error message indicating account not found
+                    data:
+                      type: string
+                      description: Null data for a failed request

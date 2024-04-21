@@ -4,9 +4,11 @@ import usersController from "../controllers/users.controller";
 
 const userRouter : Router = express.Router()
 
-userRouter.param('id', usersController.checkId)
+userRouter.param('username', usersController.checkUsername)
 
-userRouter.get("/:id", usersController.getUserById)
+userRouter.get("/:username", usersController.checkUsername, usersController.getUserByUsername)
+
+userRouter.delete("/:username", usersController.deleteUserByUsername);
 
 userRouter.post("/", [
     body('username').notEmpty().withMessage('Username is required'),
@@ -15,5 +17,6 @@ userRouter.post("/", [
 ], usersController.createUsers);
 
 userRouter.get("/", usersController.getAllUsers);
+
 
 export default userRouter
