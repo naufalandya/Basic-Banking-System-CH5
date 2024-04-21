@@ -22,8 +22,10 @@ app.get("/helloworld", (req : Request, res : Response) => {
 })
 
 import {accountRouter, userRouter, transactionRouter} from './src/routes/index'
-import { login, register } from "./src/auth/token.auth";
+import { login, register, whoami } from "./src/auth/token.auth";
+import { restrict } from "./src/utils/auth.util";
 
+app.get('/whoami', restrict, whoami);
 app.post('/register', register);
 app.post('/login', login);
 app.use('/v1/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));

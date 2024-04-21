@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcrypt';
 import usersModel from '../model/users.model';
 import jwt, { Secret } from 'jsonwebtoken';
+import '../utils/auth.util'
 
 const { JWT_SECRET }: NodeJS.ProcessEnv = process.env;
 
@@ -131,6 +132,23 @@ export async function login(req: Request, res: Response, next: NextFunction) {
                 }
             }
         })  
+
+    } catch (error) {
+        next(error);
+    }
+}
+
+
+export async function whoami(req : Request , res : Response, next : NextFunction) {
+    try {
+
+        const user = req.user
+
+        res.json({
+            status: true,
+            message: 'OK',
+            data: user
+        });
 
     } catch (error) {
         next(error);

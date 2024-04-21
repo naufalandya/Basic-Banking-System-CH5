@@ -12,11 +12,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.login = exports.register = void 0;
+exports.whoami = exports.login = exports.register = void 0;
 const client_1 = require("@prisma/client");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const users_model_1 = __importDefault(require("../model/users.model"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+require("../utils/auth.util");
 const { JWT_SECRET } = process.env;
 const prisma = new client_1.PrismaClient();
 function register(req, res, next) {
@@ -133,3 +134,19 @@ function login(req, res, next) {
     });
 }
 exports.login = login;
+function whoami(req, res, next) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const user = req.user;
+            res.json({
+                status: true,
+                message: 'OK',
+                data: user
+            });
+        }
+        catch (error) {
+            next(error);
+        }
+    });
+}
+exports.whoami = whoami;
