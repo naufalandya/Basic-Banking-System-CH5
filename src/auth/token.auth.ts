@@ -1,12 +1,10 @@
 import { PrismaClient } from '@prisma/client';
 import { Request, Response, NextFunction } from 'express';
-import {hash, compare} from 'bcrypt';
+import bcrypt from 'bcrypt';
 import usersModel from '../model/users.model';
 import jwt, { Secret } from 'jsonwebtoken';
 
 const { JWT_SECRET }: NodeJS.ProcessEnv = process.env;
-
-console.log(JWT_SECRET)
 
 const prisma = new PrismaClient();
 interface RequestBody {
@@ -43,25 +41,36 @@ export async function register(req : Request, res : Response, next : NextFunctio
             });
         }
 
-        let encryptedPassword = await hash(password, 10);
+        await bcrypt.hash(password, 10).then( async (isMatch) => {
+            if(isMatch){
 
-        console.log(encryptedPassword)
-        
-        let user = await usersModel.createUser(username, email, encryptedPassword)
+                console.log(password)
 
-        const resUser = {
-            id : user?.id,
-            username : user?.username,
-            email : user?.email,
-            role : user?.role
-        }
+                let user = await usersModel.createUser(username, email, password)
 
-        return res.status(201).json({
-            status: true,
-            message: 'OK',
-            data: resUser
+                console.log(user?.password)
+
+                const resUser = {
+                    id : user?.id,
+                    username : user?.username,
+                    email : user?.email,
+                    role : user?.role
+                }
+
+                return res.status(201).json({
+                    status: true,
+                    message: 'OK',
+                    data: resUser
+                });
+
+            } else {
+                return res.status(500).json({
+                    status: false,
+                    message: 'Invalid',
+                    data: "Internal server error"
+                });
+            }
         });
-
     } catch (error) {
         next(error);
     }
@@ -69,15 +78,9 @@ export async function register(req : Request, res : Response, next : NextFunctio
 
 export async function login(req: Request, res: Response, next: NextFunction) {
     try {
-        if (JWT_SECRET === undefined) {
-            throw new Error('JWT_SECRET is not defined');
-        }
-
 
         let { email, password } : RequestBody = req.body;
         
-        cekpw(password);
-
         console.log(req.body)
         if (!email || !password) {
             return res.status(400).json({
@@ -87,11 +90,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
             });
         }
 
-        let user = await prisma.users.findFirst({ where: { email } });
-
-        console.log(user)
-     
-        console.log(user?.password);
+        const user = await prisma.users.findFirst({ where: { email } });
 
         if (!user) {
             return res.status(400).json({
@@ -100,46 +99,40 @@ export async function login(req: Request, res: Response, next: NextFunction) {
                 data: null
             });
         }
+
+        const encryptedPassword : string = user.password
+
+        console.log(password, encryptedPassword)
       
-        const isPasswordCorrect = await compare(password, user.password)
-
-        if (!isPasswordCorrect) {
-            return res.status(400).json({
-                status: false,
-                message: 'invalid password!',
-                data: null
-            });
-        }
-
-        const resUser = {
-            id: user?.id,
-            username: user?.username,
-            email: user?.email,
-            role: user?.role
-        }
-
-        let token = jwt.sign(resUser, JWT_SECRET as Secret);
-
-        res.json({
-            status: true,
-            message: 'OK',
-            data: { ...resUser, token }
-        });
+        await bcrypt.compare(password, encryptedPassword).then((isPasswordCorrect : boolean) => {
+            console.log(isPasswordCorrect)
+            if(isPasswordCorrect){
+                const resUser = {
+                    id: user?.id,
+                    username: user?.username,
+                    email: user?.email,
+                    role: user?.role
+                }
+        
+                let token = jwt.sign(resUser, JWT_SECRET as Secret);
+        
+                res.json({
+                    status: true,
+                    message: 'OK',
+                    data: { ...resUser, token }
+                });
+            } else {
+                if (!isPasswordCorrect) {
+                    return res.status(400).json({
+                        status: false,
+                        message: 'invalid password!',
+                        data: null
+                    });
+                }
+            }
+        })  
 
     } catch (error) {
         next(error);
     }
-}
-
-export async function cekpw(password : string){
-    const user = await prisma.users.findFirst({ where: { email : "55555@gmail.com"} });
-    
-    if (user) {
-        const isPasswordCorrect = await compare(password, user.password)
-
-        if (!isPasswordCorrect) {
-           console.log(isPasswordCorrect)
-        }
-    }
-       
 }

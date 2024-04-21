@@ -7,6 +7,7 @@ const index_1 = __importDefault(require("./index"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config({ path: './.env' });
 const PORT = Number(process.env.PORT) || 5102;
+const data1 = "andya";
 index_1.default.listen(PORT, () => {
     console.log(`Server berjalan di PORT ${PORT}`);
 });

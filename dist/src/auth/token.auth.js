@@ -14,11 +14,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.login = exports.register = void 0;
 const client_1 = require("@prisma/client");
-const bcrypt_1 = require("bcrypt");
+const bcrypt_1 = __importDefault(require("bcrypt"));
 const users_model_1 = __importDefault(require("../model/users.model"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const { JWT_SECRET } = process.env;
-console.log(JWT_SECRET);
 const prisma = new client_1.PrismaClient();
 function register(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -47,20 +46,31 @@ function register(req, res, next) {
                     data: null
                 });
             }
-            let encryptedPassword = yield (0, bcrypt_1.hash)(password, 10);
-            console.log(encryptedPassword);
-            let user = yield users_model_1.default.createUser(username, email, encryptedPassword);
-            const resUser = {
-                id: user === null || user === void 0 ? void 0 : user.id,
-                username: user === null || user === void 0 ? void 0 : user.username,
-                email: user === null || user === void 0 ? void 0 : user.email,
-                role: user === null || user === void 0 ? void 0 : user.role
-            };
-            return res.status(201).json({
-                status: true,
-                message: 'OK',
-                data: resUser
-            });
+            yield bcrypt_1.default.hash(password, 10).then((isMatch) => __awaiter(this, void 0, void 0, function* () {
+                if (isMatch) {
+                    console.log(password);
+                    let user = yield users_model_1.default.createUser(username, email, password);
+                    console.log(user === null || user === void 0 ? void 0 : user.password);
+                    const resUser = {
+                        id: user === null || user === void 0 ? void 0 : user.id,
+                        username: user === null || user === void 0 ? void 0 : user.username,
+                        email: user === null || user === void 0 ? void 0 : user.email,
+                        role: user === null || user === void 0 ? void 0 : user.role
+                    };
+                    return res.status(201).json({
+                        status: true,
+                        message: 'OK',
+                        data: resUser
+                    });
+                }
+                else {
+                    return res.status(500).json({
+                        status: false,
+                        message: 'Invalid',
+                        data: "Internal server error"
+                    });
+                }
+            }));
         }
         catch (error) {
             next(error);
@@ -71,11 +81,7 @@ exports.register = register;
 function login(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            if (JWT_SECRET === undefined) {
-                throw new Error('JWT_SECRET is not defined');
-            }
             let { email, password } = req.body;
-            cekpw(password);
             console.log(req.body);
             if (!email || !password) {
                 return res.status(400).json({
@@ -84,9 +90,7 @@ function login(req, res, next) {
                     data: null
                 });
             }
-            let user = yield prisma.users.findFirst({ where: { email } });
-            console.log(user);
-            console.log(user === null || user === void 0 ? void 0 : user.password);
+            const user = yield prisma.users.findFirst({ where: { email } });
             if (!user) {
                 return res.status(400).json({
                     status: false,
@@ -94,25 +98,33 @@ function login(req, res, next) {
                     data: null
                 });
             }
-            const isPasswordCorrect = yield (0, bcrypt_1.compare)(password, user.password);
-            if (!isPasswordCorrect) {
-                return res.status(400).json({
-                    status: false,
-                    message: 'invalid password!',
-                    data: null
-                });
-            }
-            const resUser = {
-                id: user === null || user === void 0 ? void 0 : user.id,
-                username: user === null || user === void 0 ? void 0 : user.username,
-                email: user === null || user === void 0 ? void 0 : user.email,
-                role: user === null || user === void 0 ? void 0 : user.role
-            };
-            let token = jsonwebtoken_1.default.sign(resUser, JWT_SECRET);
-            res.json({
-                status: true,
-                message: 'OK',
-                data: Object.assign(Object.assign({}, resUser), { token })
+            const encryptedPassword = user.password;
+            console.log(password, encryptedPassword);
+            yield bcrypt_1.default.compare(password, encryptedPassword).then((isPasswordCorrect) => {
+                console.log(isPasswordCorrect);
+                if (isPasswordCorrect) {
+                    const resUser = {
+                        id: user === null || user === void 0 ? void 0 : user.id,
+                        username: user === null || user === void 0 ? void 0 : user.username,
+                        email: user === null || user === void 0 ? void 0 : user.email,
+                        role: user === null || user === void 0 ? void 0 : user.role
+                    };
+                    let token = jsonwebtoken_1.default.sign(resUser, JWT_SECRET);
+                    res.json({
+                        status: true,
+                        message: 'OK',
+                        data: Object.assign(Object.assign({}, resUser), { token })
+                    });
+                }
+                else {
+                    if (!isPasswordCorrect) {
+                        return res.status(400).json({
+                            status: false,
+                            message: 'invalid password!',
+                            data: null
+                        });
+                    }
+                }
             });
         }
         catch (error) {
@@ -121,15 +133,3 @@ function login(req, res, next) {
     });
 }
 exports.login = login;
-function cekpw(password) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const user = yield prisma.users.findFirst({ where: { email: "1010101010@gmail.com" } });
-        if (user) {
-            const isPasswordCorrect = yield (0, bcrypt_1.compare)(password, user.password);
-            if (!isPasswordCorrect) {
-                console.log(isPasswordCorrect);
-            }
-        }
-    });
-}
-cekpw("1010101010");
