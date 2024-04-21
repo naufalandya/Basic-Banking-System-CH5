@@ -1,7 +1,7 @@
-# Project Name
+# Basic-Banking-System
 
 ## Description
-Brief description of your project.
+Managing Banking System
 
 ## Installation
 1. Clone the repository.
