@@ -7,8 +7,9 @@ const express_validator_1 = require("express-validator");
 const express_1 = __importDefault(require("express"));
 const users_controller_1 = __importDefault(require("../controllers/users.controller"));
 const userRouter = express_1.default.Router();
-userRouter.param('id', users_controller_1.default.checkId);
-userRouter.get("/:id", users_controller_1.default.getUserById);
+userRouter.param('username', users_controller_1.default.checkUsername);
+userRouter.get("/:username", users_controller_1.default.checkUsername, users_controller_1.default.getUserByUsername);
+userRouter.delete("/:username", users_controller_1.default.deleteUserByUsername);
 userRouter.post("/", [
     (0, express_validator_1.body)('username').notEmpty().withMessage('Username is required'),
     (0, express_validator_1.body)('email').notEmpty().withMessage('Email is required').isEmail().withMessage('Email is not valid'),

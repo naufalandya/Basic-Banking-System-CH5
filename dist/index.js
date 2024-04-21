@@ -21,6 +21,9 @@ app.get("/helloworld", (req, res) => {
     });
 });
 const index_1 = require("./src/routes/index");
+const token_auth_1 = require("./src/auth/token.auth");
+app.post('/register', token_auth_1.register);
+app.post('/login', token_auth_1.login);
 app.use('/v1/api-docs', swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swaggerDocument));
 app.use("/api/v1/accounts", index_1.accountRouter);
 app.use("/api/v1/users", index_1.userRouter);

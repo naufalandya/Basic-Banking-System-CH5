@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { Request, Response, NextFunction } from 'express';
-import bcrypt from 'bcrypt';
+import {hash, compare} from 'bcrypt';
 import usersModel from '../model/users.model';
 import jwt, { Secret } from 'jsonwebtoken';
 
@@ -43,7 +43,9 @@ export async function register(req : Request, res : Response, next : NextFunctio
             });
         }
 
-        let encryptedPassword = await bcrypt.hash(password, 10);
+        let encryptedPassword = await hash(password, 10);
+
+        console.log(encryptedPassword)
         
         let user = await usersModel.createUser(username, email, encryptedPassword)
 
@@ -71,7 +73,12 @@ export async function login(req: Request, res: Response, next: NextFunction) {
             throw new Error('JWT_SECRET is not defined');
         }
 
+
         let { email, password } : RequestBody = req.body;
+        
+        cekpw(password);
+
+        console.log(req.body)
         if (!email || !password) {
             return res.status(400).json({
                 status: false,
@@ -81,9 +88,10 @@ export async function login(req: Request, res: Response, next: NextFunction) {
         }
 
         let user = await prisma.users.findFirst({ where: { email } });
+
+        console.log(user)
      
-        console.log(typeof password)
-        console.log(typeof user?.password);
+        console.log(user?.password);
 
         if (!user) {
             return res.status(400).json({
@@ -92,12 +100,9 @@ export async function login(req: Request, res: Response, next: NextFunction) {
                 data: null
             });
         }
+      
+        const isPasswordCorrect = await compare(password, user.password)
 
-        let isPasswordCorrect = await bcrypt.compare(password, user?.password);
-
-        console.log(isPasswordCorrect)
-
-        /*
         if (!isPasswordCorrect) {
             return res.status(400).json({
                 status: false,
@@ -105,7 +110,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
                 data: null
             });
         }
-        */
+
         const resUser = {
             id: user?.id,
             username: user?.username,
@@ -124,4 +129,17 @@ export async function login(req: Request, res: Response, next: NextFunction) {
     } catch (error) {
         next(error);
     }
+}
+
+export async function cekpw(password : string){
+    const user = await prisma.users.findFirst({ where: { email : "55555@gmail.com"} });
+    
+    if (user) {
+        const isPasswordCorrect = await compare(password, user.password)
+
+        if (!isPasswordCorrect) {
+           console.log(isPasswordCorrect)
+        }
+    }
+       
 }

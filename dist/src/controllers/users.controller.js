@@ -42,6 +42,32 @@ class UsersController {
             }
         });
     }
+    checkUsername(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const username = req.params.username;
+                const user = yield users_model_1.default.getUserByUsername(username);
+                if (!user) {
+                    return res.status(404).json({
+                        status: false,
+                        message: `user with username ${username} is not exist`,
+                        data: null
+                    });
+                }
+                else {
+                    next();
+                }
+            }
+            catch (error) {
+                console.error("Error fetching user:", error);
+                return res.status(500).json({
+                    status: false,
+                    message: "Internal server error",
+                    data: null
+                });
+            }
+        });
+    }
     createUsers(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             const errors = (0, express_validator_1.validationResult)(req);
@@ -122,6 +148,74 @@ class UsersController {
                     return res.status(404).json({
                         status: false,
                         message: `User with id ${id} is not exist`,
+                        data: null
+                    });
+                }
+                const userData = {
+                    id: user.id,
+                    username: user.username,
+                    email: user.email,
+                    role: user.role
+                };
+                return res.status(201).json({
+                    status: true,
+                    message: "success",
+                    data: userData
+                });
+            }
+            catch (error) {
+                console.error("Error fetching user:", error);
+                return res.status(500).json({
+                    status: false,
+                    message: "Internal server error",
+                    data: null
+                });
+            }
+        });
+    }
+    getUserByUsername(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const username = req.params.username;
+                const user = yield users_model_1.default.getUserByUsername(username);
+                if (!user) {
+                    return res.status(404).json({
+                        status: false,
+                        message: `User with username ${username} is not exist`,
+                        data: null
+                    });
+                }
+                const userData = {
+                    id: user.id,
+                    username: user.username,
+                    email: user.email,
+                    role: user.role
+                };
+                return res.status(201).json({
+                    status: true,
+                    message: "success",
+                    data: userData
+                });
+            }
+            catch (error) {
+                console.error("Error fetching user:", error);
+                return res.status(500).json({
+                    status: false,
+                    message: "Internal server error",
+                    data: null
+                });
+            }
+        });
+    }
+    deleteUserByUsername(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const username = req.params.username;
+                const user = yield users_model_1.default.deleteUserByUsername(username);
+                if (!user) {
+                    return res.status(404).json({
+                        status: false,
+                        message: `User with username ${username} is not exist`,
                         data: null
                     });
                 }
