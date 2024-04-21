@@ -9,8 +9,6 @@ import fs from 'fs';
 const file = fs.readFileSync('./api-docs.yaml', 'utf-8');
 const swaggerDocument = YAML.parse(file);
 
-
-
 const app : Express = express()
 
 app.use(cors());

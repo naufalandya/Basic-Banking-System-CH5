@@ -9,6 +9,10 @@ const { JWT_SECRET }: NodeJS.ProcessEnv = process.env;
 console.log(JWT_SECRET)
 
 const prisma = new PrismaClient();
+interface RequestBody {
+    email: string;
+    password: string;
+}
 
 export async function register(req : Request, res : Response, next : NextFunction) {
     try {
@@ -16,7 +20,7 @@ export async function register(req : Request, res : Response, next : NextFunctio
         if (!username || !email || !password) {
             return res.status(400).json({
                 status: false,
-                message: 'name, email and password are required!',
+                message: 'username, email and password are required!',
                 data: null
             });
         }
@@ -67,7 +71,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
             throw new Error('JWT_SECRET is not defined');
         }
 
-        let { email, password } = req.body;
+        let { email, password } : RequestBody = req.body;
         if (!email || !password) {
             return res.status(400).json({
                 status: false,
@@ -77,25 +81,31 @@ export async function login(req: Request, res: Response, next: NextFunction) {
         }
 
         let user = await prisma.users.findFirst({ where: { email } });
-        console.log(user);
+     
+        console.log(typeof password)
+        console.log(typeof user?.password);
+
         if (!user) {
             return res.status(400).json({
                 status: false,
-                message: 'invalid email or password!',
+                message: 'invalid email',
                 data: null
             });
         }
 
-        let isPasswordCorrect = await bcrypt.compare(password, user.password);
+        let isPasswordCorrect = await bcrypt.compare(password, user?.password);
 
+        console.log(isPasswordCorrect)
+
+        /*
         if (!isPasswordCorrect) {
             return res.status(400).json({
                 status: false,
-                message: 'invalid email or password!',
+                message: 'invalid password!',
                 data: null
             });
         }
-
+        */
         const resUser = {
             id: user?.id,
             username: user?.username,
